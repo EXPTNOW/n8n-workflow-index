@@ -6,7 +6,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   
   const sessionId = "user-session-" + Date.now();
-  const webhookURL = "https://expandingtogether.app.n8n.cloud/webhook-test/Workflow AI Index";
+  const webhookURL = "https://expandingtogether.app.n8n.cloud/webhook-test/Workflow%20AI%20Index";
   
   const sendMessage = async () => {
     if (!input.trim()) return;
