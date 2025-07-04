@@ -60,8 +60,8 @@ export default function App() {
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.length === 0 && (
             <div className="text-center text-gray-500 mt-8">
-              <p className="text-lg mb-2">Welcome! I can help you find n8n workflows.</p>
-              <p className="text-sm">Ask me about automations you'd like to create!</p>
+              <p className="text-lg mb-2">Welcome! I'm your assistant for building smarter workflows.</p>
+              <p className="text-sm">Just tell me your ideas!</p>
             </div>
           )}
           
