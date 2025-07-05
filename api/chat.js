@@ -15,16 +15,39 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('Received request body:', req.body);
+
     const n8nResponse = await fetch('https://expandingtogether.app.n8n.cloud/webhook/Workflow%20AI%20Index', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
     });
 
-    const responseData = await n8nResponse.json();
+    console.log('n8n response status:', n8nResponse.status);
+
+    if (!n8nResponse.ok) {
+      throw new Error(`n8n responded with status: ${n8nResponse.status}`);
+    }
+
+    // Try to get response as text first
+    const responseText = await n8nResponse.text();
+    console.log('n8n response text:', responseText);
+
+    // Try to parse as JSON
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      // If not JSON, return as text
+      responseData = { output: responseText };
+    }
+
     res.status(200).json(responseData);
   } catch (error) {
     console.error('Proxy error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message 
+    });
   }
 }
