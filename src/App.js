@@ -27,7 +27,6 @@ export default function App() {
       });
       
       const data = await res.json();
-      console.log('Received data:', data); // Debug log
       
       // Extract the actual message content from the response
       let botText;
@@ -43,11 +42,8 @@ export default function App() {
         botText = "I couldn't process that request. Please try again.";
       }
       
-      console.log('Extracted botText:', botText); // Debug log
-      
       // Check if botText itself contains JSON structure
       if (typeof botText === 'string' && botText.includes('"output":')) {
-        // Try to parse the nested JSON
         try {
           const nestedData = JSON.parse(botText);
           if (nestedData.output) {
@@ -93,18 +89,40 @@ export default function App() {
     }
   };
 
-  // Function to render text with basic markdown-like formatting
+  // Function to render text with better markdown formatting
   const renderMessage = (text) => {
-    // Replace markdown-style formatting with HTML
+    // Clean up and format the text
     const formattedText = text
-      .replace(/### (.*?)(\n|$)/g, '<h3 class="font-bold text-lg mb-2">$1</h3>')
-      .replace(/## (.*?)(\n|$)/g, '<h2 class="font-bold text-xl mb-2">$1</h2>')
-      .replace(/# (.*?)(\n|$)/g, '<h1 class="font-bold text-2xl mb-2">$1</h1>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br>');
+      // Convert headers
+      .replace(/### (.*?)(\n|$)/g, '<h3 class="font-bold text-lg mb-2 mt-3">$1</h3>')
+      .replace(/## (.*?)(\n|$)/g, '<h2 class="font-bold text-xl mb-2 mt-4">$1</h2>')
+      .replace(/# (.*?)(\n|$)/g, '<h1 class="font-bold text-2xl mb-2 mt-4">$1</h1>')
+      
+      // Clean up bullet points but keep 🔹 diamonds
+      .replace(/^\s*[\*\-\+]\s*🔹\s*/gm, '🔹 ')
+      .replace(/^\s*[\*\-\+]\s*(?!🔹)/gm, '• ')
+      
+      // Clean up numbered lists but keep emojis
+      .replace(/^\s*\d+\.\s*🎯\s*/gm, '🎯 ')
+      .replace(/^\s*\d+\.\s*(?![🎯🔹])/gm, '')
+      
+      // Convert bold and italic
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+      
+      // Convert line breaks
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
+      
+      // Clean up markdown symbols but keep emojis
+      .replace(/\*\*:/g, ':')
+      .replace(/\*\*\./g, '.')
+      
+      // Format sections better
+      .replace(/^(\s*•\s*.+?):/gm, '<strong>$1:</strong>')
+      .replace(/(\w+):\s*$/gm, '<strong class="block mt-3 mb-1">$1:</strong>');
     
-    return <div dangerouslySetInnerHTML={{ __html: formattedText }} />;
+    return <div dangerouslySetInnerHTML={{ __html: formattedText }} className="leading-relaxed" />;
   };
   
   return (
