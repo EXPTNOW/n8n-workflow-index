@@ -98,24 +98,25 @@ export default function App() {
       .replace(/## (.*?)(\n|$)/g, '<h2 class="font-bold text-xl mb-2 mt-4">$1</h2>')
       .replace(/# (.*?)(\n|$)/g, '<h1 class="font-bold text-2xl mb-2 mt-4">$1</h1>')
       
-      // Clean up bullet points - remove * and - symbols, and 🔹 diamonds
-      .replace(/^\s*[\*\-\+]\s*🔹?\s*/gm, '• ')
+      // Clean up bullet points - remove ALL * and - symbols
       .replace(/^\s*[\*\-\+]\s*/gm, '• ')
+      .replace(/\*\s+/g, '• ')  // Also catch standalone asterisks with spaces
       
       // Convert numbered lists
-      .replace(/^\s*\d+\.\s*🎯?\s*/gm, '')
       .replace(/^\s*\d+\.\s*/gm, '')
       
-      // Convert bold and italic
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+      // Convert bold and italic (but not the asterisks used for bullets)
+      .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold">$1</strong>')
       
       // Convert line breaks
       .replace(/\n\n/g, '<br><br>')
       .replace(/\n/g, '<br>')
       
-      // Clean up extra symbols including remaining diamonds
+      // Clean up any remaining formatting symbols
       .replace(/🔹/g, '')
+      .replace(/\*\*:/g, ':')
+      .replace(/\*\*\./g, '.')
+      .replace(/\s*\*\s*/g, ' ')  // Remove any remaining asterisks with spaces, '')
       .replace(/\*\*:/g, ':')
       .replace(/\*\*\./g, '.')
       
@@ -123,22 +124,22 @@ export default function App() {
       .replace(/^(\s*•\s*.+?):/gm, '<strong>$1:</strong>')
       .replace(/(\w+):\s*$/gm, '<strong class="block mt-3 mb-1">$1:</strong>');
     
-    return <div dangerouslySetInnerHTML={{ __html: formattedText }} className="leading-relaxed" />;
+    return <div dangerouslySetInnerHTML={{ __html: formattedText }} className="leading-relaxed break-words" style={{ wordWrap: 'break-word', wordBreak: 'break-word', overflowWrap: 'break-word' }} />;
   };
   
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-xl flex flex-col h-[80vh]">
-        <div className="bg-black text-white p-4 rounded-t-xl">
-          <h2 className="text-xl font-bold">🤖 n8n Workflow Assistant</h2>
-          <p className="text-sm opacity-80">Find the perfect workflow for your automation needs</p>
+    <div className="min-h-screen bg-gray-100 p-2 sm:p-4">
+      <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-xl flex flex-col h-[90vh] sm:h-[80vh]">
+        <div className="bg-black text-white p-3 sm:p-4 rounded-t-xl">
+          <h2 className="text-lg sm:text-xl font-bold">🤖 n8n Workflow Assistant</h2>
+          <p className="text-xs sm:text-sm opacity-80">Find the perfect workflow for your automation needs</p>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
           {messages.length === 0 && (
             <div className="text-center text-gray-500 mt-8">
-              <p className="text-lg mb-2">Welcome! I'm your assistant for building smarter workflows.</p>
-              <p className="text-sm">Just tell me your ideas!</p>
+              <p className="text-base sm:text-lg mb-2">Welcome! I'm your assistant for building smarter workflows.</p>
+              <p className="text-xs sm:text-sm">Just tell me your ideas!</p>
             </div>
           )}
           
@@ -148,11 +149,16 @@ export default function App() {
               className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[70%] p-3 rounded-lg ${
+                className={`max-w-[85%] sm:max-w-[70%] p-3 rounded-lg break-words ${
                   msg.sender === "user"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200 text-gray-800"
                 }`}
+                style={{ 
+                  wordWrap: 'break-word', 
+                  wordBreak: 'break-word',
+                  overflowWrap: 'break-word'
+                }}
               >
                 {msg.sender === "bot" ? renderMessage(msg.text) : msg.text}
               </div>
@@ -172,7 +178,7 @@ export default function App() {
           )}
         </div>
         
-        <div className="p-4 border-t">
+        <div className="p-3 sm:p-4 border-t">
           <div className="flex space-x-2">
             <textarea
               value={input}
@@ -180,13 +186,13 @@ export default function App() {
               onKeyDown={handleKeyDown}
               placeholder="Ask me about workflows..."
               rows={1}
-              className="flex-1 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{minHeight: '48px', maxHeight: '120px'}}
+              className="flex-1 p-2 sm:p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+              style={{minHeight: '40px', maxHeight: '120px'}}
             />
             <button
               onClick={sendMessage}
               disabled={loading || !input.trim()}
-              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-blue-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
             >
               Send
             </button>
