@@ -98,13 +98,13 @@ export default function App() {
       .replace(/## (.*?)(\n|$)/g, '<h2 class="font-bold text-xl mb-2 mt-4">$1</h2>')
       .replace(/# (.*?)(\n|$)/g, '<h1 class="font-bold text-2xl mb-2 mt-4">$1</h1>')
       
-      // Clean up bullet points but keep 🔹 diamonds
-      .replace(/^\s*[\*\-\+]\s*🔹\s*/gm, '🔹 ')
-      .replace(/^\s*[\*\-\+]\s*(?!🔹)/gm, '• ')
+      // Clean up bullet points - remove * and - symbols, and 🔹 diamonds
+      .replace(/^\s*[\*\-\+]\s*🔹?\s*/gm, '• ')
+      .replace(/^\s*[\*\-\+]\s*/gm, '• ')
       
-      // Clean up numbered lists but keep emojis
-      .replace(/^\s*\d+\.\s*🎯\s*/gm, '🎯 ')
-      .replace(/^\s*\d+\.\s*(?![🎯🔹])/gm, '')
+      // Convert numbered lists
+      .replace(/^\s*\d+\.\s*🎯?\s*/gm, '')
+      .replace(/^\s*\d+\.\s*/gm, '')
       
       // Convert bold and italic
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
@@ -114,7 +114,8 @@ export default function App() {
       .replace(/\n\n/g, '<br><br>')
       .replace(/\n/g, '<br>')
       
-      // Clean up markdown symbols but keep emojis
+      // Clean up extra symbols including remaining diamonds
+      .replace(/🔹/g, '')
       .replace(/\*\*:/g, ':')
       .replace(/\*\*\./g, '.')
       
