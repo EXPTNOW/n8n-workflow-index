@@ -27,9 +27,22 @@ export default function App() {
       });
       
       const data = await res.json();
+      
+      // Extract the actual message content from the response
+      let botText;
+      if (data.output) {
+        botText = data.output;
+      } else if (data.text) {
+        botText = data.text;
+      } else if (data.response) {
+        botText = data.response;
+      } else {
+        botText = "I couldn't process that request. Please try again.";
+      }
+      
       const aiReply = {
         sender: "bot",
-        text: data.output || "I couldn't process that request. Please try again."
+        text: botText
       };
       setMessages((prev) => [...prev, aiReply]);
     } catch (err) {
@@ -47,6 +60,20 @@ export default function App() {
       e.preventDefault();
       sendMessage();
     }
+  };
+
+  // Function to render text with basic markdown-like formatting
+  const renderMessage = (text) => {
+    // Replace markdown-style formatting with HTML
+    const formattedText = text
+      .replace(/### (.*?)(\n|$)/g, '<h3 class="font-bold text-lg mb-2">$1</h3>')
+      .replace(/## (.*?)(\n|$)/g, '<h2 class="font-bold text-xl mb-2">$1</h2>')
+      .replace(/# (.*?)(\n|$)/g, '<h1 class="font-bold text-2xl mb-2">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+    
+    return <div dangerouslySetInnerHTML={{ __html: formattedText }} />;
   };
   
   return (
@@ -77,7 +104,7 @@ export default function App() {
                     : "bg-gray-200 text-gray-800"
                 }`}
               >
-                {msg.text}
+                {msg.sender === "bot" ? renderMessage(msg.text) : msg.text}
               </div>
             </div>
           ))}
