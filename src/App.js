@@ -36,9 +36,15 @@ export default function App() {
         botText = data.text;
       } else if (data.response) {
         botText = data.response;
+      } else if (typeof data === 'string') {
+        botText = data;
       } else {
-        botText = "I couldn't process that request. Please try again.";
+        // If we get the whole response object, try to extract just the content
+        botText = JSON.stringify(data).replace(/^\{"output":\s*"/, '').replace(/"\}$/, '') || "I couldn't process that request. Please try again.";
       }
+      
+      // Clean up any remaining JSON artifacts
+      botText = botText.replace(/^\{"output":\s*"/, '').replace(/"\}$/, '');
       
       const aiReply = {
         sender: "bot",
