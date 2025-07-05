@@ -27,6 +27,7 @@ export default function App() {
       });
       
       const data = await res.json();
+      console.log('Received data:', data); // Debug log
       
       // Extract the actual message content from the response
       let botText;
@@ -42,13 +43,33 @@ export default function App() {
         botText = "I couldn't process that request. Please try again.";
       }
       
-      // Aggressively clean up any JSON artifacts
+      console.log('Extracted botText:', botText); // Debug log
+      
+      // Check if botText itself contains JSON structure
+      if (typeof botText === 'string' && botText.includes('"output":')) {
+        // Try to parse the nested JSON
+        try {
+          const nestedData = JSON.parse(botText);
+          if (nestedData.output) {
+            botText = nestedData.output;
+          }
+        } catch (e) {
+          // If parsing fails, clean it manually
+          botText = botText
+            .replace(/^\s*\{\s*"output":\s*"/, '')
+            .replace(/"\s*\}\s*$/, '')
+            .replace(/\\n/g, '\n')
+            .replace(/\\"/g, '"');
+        }
+      }
+      
+      // Final cleanup
       botText = botText
-        .replace(/^\s*\{\s*"output":\s*"/, '')  // Remove opening JSON
-        .replace(/"\s*\}\s*$/, '')              // Remove closing JSON
-        .replace(/^"/, '')                      // Remove leading quote
-        .replace(/"$/, '')                      // Remove trailing quote
-        .trim();                               // Remove whitespace
+        .replace(/^\s*\{\s*"output":\s*"/, '')
+        .replace(/"\s*\}\s*$/, '')
+        .replace(/^"/, '')
+        .replace(/"$/, '')
+        .trim();
       
       const aiReply = {
         sender: "bot",
