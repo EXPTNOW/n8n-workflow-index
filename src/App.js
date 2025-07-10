@@ -6,7 +6,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   
   const sessionId = "user-session-" + Date.now();
-  const webhookURL = "https://expandingtogether.app.n8n.cloud/webhook/e695e382-99dc-4925-b500-354a4275ffd2";
+  const webhookURL = "/api/chat";
   
   const sendMessage = async () => {
     if (!input.trim()) return;
