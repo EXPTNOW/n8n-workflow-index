@@ -29,8 +29,6 @@ export default function App() {
       
       const data = await res.json();
       
-      console.log('Raw response from API:', data);
-      
       // Extract the actual message content from the response
       let botText;
       if (data.output) {
