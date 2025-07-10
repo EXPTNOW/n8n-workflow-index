@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from 'react-markdown';
 
 export default function App() {
   const [messages, setMessages] = useState([]);
@@ -59,7 +60,7 @@ export default function App() {
         }
       }
       
-      // Final cleanup
+      // Final cleanup - keep the original markdown format
       botText = botText
         .replace(/^\s*\{\s*"output":\s*"/, '')
         .replace(/"\s*\}\s*$/, '')
@@ -89,42 +90,17 @@ export default function App() {
     }
   };
 
-  // Function to render text with better markdown formatting
-  const renderMessage = (text) => {
-    // Clean up and format the text
-    const formattedText = text
-      // Convert headers
-      .replace(/### (.*?)(\n|$)/g, '<h3 class="font-bold text-lg mb-2 mt-3">$1</h3>')
-      .replace(/## (.*?)(\n|$)/g, '<h2 class="font-bold text-xl mb-2 mt-4">$1</h2>')
-      .replace(/# (.*?)(\n|$)/g, '<h1 class="font-bold text-2xl mb-2 mt-4">$1</h1>')
-      
-      // Clean up bullet points - remove ALL * and - symbols
-      .replace(/^\s*[\*\-\+]\s*/gm, '• ')
-      .replace(/\*\s+/g, '• ')  // Also catch standalone asterisks with spaces
-      
-      // Convert numbered lists
-      .replace(/^\s*\d+\.\s*/gm, '')
-      
-      // Convert bold and italic (but not the asterisks used for bullets)
-      .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold">$1</strong>')
-      
-      // Convert line breaks
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>')
-      
-      // Clean up any remaining formatting symbols
-      .replace(/🔹/g, '')
-      .replace(/\*\*:/g, ':')
-      .replace(/\*\*\./g, '.')
-      .replace(/\s*\*\s*/g, ' ')  // Remove any remaining asterisks with spaces, '')
-      .replace(/\*\*:/g, ':')
-      .replace(/\*\*\./g, '.')
-      
-      // Format sections better
-      .replace(/^(\s*•\s*.+?):/gm, '<strong>$1:</strong>')
-      .replace(/(\w+):\s*$/gm, '<strong class="block mt-3 mb-1">$1:</strong>');
-    
-    return <div dangerouslySetInnerHTML={{ __html: formattedText }} className="leading-relaxed break-words" style={{ wordWrap: 'break-word', wordBreak: 'break-word', overflowWrap: 'break-word' }} />;
+  // Custom styles for ReactMarkdown components
+  const markdownComponents = {
+    h1: ({children}) => <h1 className="text-2xl font-bold mb-3 mt-4">{children}</h1>,
+    h2: ({children}) => <h2 className="text-xl font-bold mb-2 mt-3">{children}</h2>,
+    h3: ({children}) => <h3 className="text-lg font-bold mb-2 mt-3">{children}</h3>,
+    p: ({children}) => <p className="mb-2 leading-relaxed">{children}</p>,
+    ul: ({children}) => <ul className="list-disc list-inside mb-2 ml-2">{children}</ul>,
+    li: ({children}) => <li className="mb-1">{children}</li>,
+    strong: ({children}) => <strong className="font-semibold">{children}</strong>,
+    hr: () => <hr className="my-3 border-gray-300" />,
+    code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm">{children}</code>,
   };
   
   return (
@@ -160,7 +136,13 @@ export default function App() {
                   overflowWrap: 'break-word'
                 }}
               >
-                {msg.sender === "bot" ? renderMessage(msg.text) : msg.text}
+                {msg.sender === "bot" ? (
+                  <ReactMarkdown components={markdownComponents}>
+                    {msg.text}
+                  </ReactMarkdown>
+                ) : (
+                  msg.text
+                )}
               </div>
             </div>
           ))}
