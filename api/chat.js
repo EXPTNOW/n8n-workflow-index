@@ -34,15 +34,27 @@ export default async function handler(req, res) {
     console.log('n8n response text:', responseText);
 
     // Try to parse as JSON
-    let responseData;
+let responseData;
+try {
+  responseData = JSON.parse(responseText);
+  
+  // If the parsed data has an output field that's also JSON, parse it again
+  if (responseData.output && typeof responseData.output === 'string') {
     try {
-      responseData = JSON.parse(responseText);
+      const nestedData = JSON.parse(responseData.output);
+      if (nestedData.output) {
+        responseData = nestedData; // Use the inner JSON
+      }
     } catch (e) {
-      // If not JSON, return as text
-      responseData = { output: responseText };
+      // If inner parsing fails, keep the outer structure
     }
+  }
+} catch (e) {
+  // If not JSON, return as text
+  responseData = { output: responseText };
+}
 
-    res.status(200).json(responseData);
+res.status(200).json(responseData);
   } catch (error) {
     console.error('Proxy error:', error);
     res.status(500).json({ 
