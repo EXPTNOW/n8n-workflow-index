@@ -6,7 +6,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   
   const sessionId = "user-session-" + Date.now();
-  const webhookURL = "https://n8n-workflow-index.vercel.app/api/chat";
+  const webhookURL = "https://expandingtogether.app.n8n.cloud/webhook/e695e382-99dc-4925-b500-354a4275ffd2";
   
   const sendMessage = async () => {
     if (!input.trim()) return;
