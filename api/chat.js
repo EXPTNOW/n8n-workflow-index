@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   try {
     console.log('Received request body:', req.body);
 
-    const n8nResponse = await fetch('https://expandingtogether.app.n8n.cloud/webhook/Workflow%20AI%20Index', {
+    const n8nResponse = await fetch('https://expandingtogether.app.n8n.cloud/webhook/e695e382-99dc-4925-b500-354a4275ffd2', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
